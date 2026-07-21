@@ -3,22 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>会員ポータル</title>
+  <title>会員専用ポータル</title>
   <style>
     :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --primary: #6366f1;
-      --primary-hover: #4f46e5;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --border: #334155;
+      --bg: #0b0f19;
+      --card: #151c2c;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --border: #1f293d;
+      --danger: #ef4444;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    
+
     body {
-      background-color: var(--bg-color);
+      background-color: var(--bg);
       color: var(--text);
       display: flex;
       justify-content: center;
@@ -27,225 +28,325 @@
       padding: 20px;
     }
 
-    .container {
-      background: var(--card-bg);
+    .card {
+      background: var(--card);
       width: 100%;
-      max-width: 420px;
-      padding: 30px;
+      max-width: 440px;
+      padding: 32px;
       border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.6);
       border: 1px solid var(--border);
     }
 
-    /* タブ切り替えボタン */
-    .tabs {
-      display: flex;
-      background: #0f172a;
-      padding: 4px;
-      border-radius: 10px;
-      margin-bottom: 25px;
-    }
+    .view { display: none; }
+    .view.active { display: block; }
 
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+    h2 { font-size: 1.6rem; text-align: center; margin-bottom: 8px; color: #fff; }
+    p.sub { font-size: 0.85rem; color: var(--muted); text-align: center; margin-bottom: 24px; }
 
-    .tab-btn.active {
-      background: var(--primary);
-      color: white;
-    }
-
-    /* フォーム切替制御 */
-    .form-group { display: none; }
-    .form-group.active { display: block; }
-
-    h2 { font-size: 1.5rem; margin-bottom: 8px; text-align: center; }
-    p.sub { font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-bottom: 20px; }
-
-    .input-field {
-      margin-bottom: 15px;
-    }
-
-    label {
-      display: block;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 5px;
-    }
+    .field { margin-bottom: 16px; }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
 
     input {
       width: 100%;
-      padding: 12px;
-      background: #0f172a;
+      padding: 12px 14px;
+      background: #0b0f19;
       border: 1px solid var(--border);
       border-radius: 8px;
-      color: white;
+      color: #fff;
       font-size: 0.95rem;
       outline: none;
-      transition: 0.3s;
     }
-
-    input:focus { border-color: var(--primary); }
 
     .btn {
       width: 100%;
       padding: 12px;
-      background: var(--primary);
+      background: var(--accent);
       color: white;
       border: none;
       border-radius: 8px;
       font-weight: bold;
-      font-size: 1rem;
+      font-size: 0.95rem;
       cursor: pointer;
       margin-top: 10px;
-      transition: 0.3s;
+      transition: 0.2s;
     }
 
-    .btn:hover { background: var(--primary-hover); }
+    .btn:hover { background: var(--accent-hover); }
 
-    /* メール認証用モーダル（ポップアップ） */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal {
-      background: var(--card-bg);
-      padding: 25px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 350px;
+    .btn-outline {
+      background: transparent;
       border: 1px solid var(--border);
-      text-align: center;
+      color: var(--text);
+      margin-top: 8px;
+    }
+
+    .btn-outline:hover { background: #1f293d; }
+
+    .timer-badge {
+      background: var(--danger);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      display: inline-block;
+      margin-bottom: 15px;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- 上部タブ -->
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('register')">新規登録</button>
-      <button class="tab-btn" onclick="switchTab('login')">ログイン</button>
+  <div class="card">
+
+    <!-- ホーム画面 -->
+    <div id="view-home" class="view active">
+      <h2>WELCOME</h2>
+      <p class="sub">サービスをご利用いただくにはログインが必要です</p>
+      <button class="btn" onclick="showView('view-login')">ログイン</button>
+      <button class="btn btn-outline" onclick="showView('view-register')">新規会員登録</button>
     </div>
 
-    <!-- 新規会員登録フォーム -->
-    <div id="register-form" class="form-group active">
-      <h2>アカウント作成</h2>
-      <p class="sub">メールアドレスとパスワードを入力してください</p>
+    <!-- 新規登録: メアド・パスワード -->
+    <div id="view-register" class="view">
+      <h2>新規会員登録</h2>
+      <p class="sub">メールアドレスとパスワードを設定してください</p>
       
-      <div class="input-field">
+      <div class="field">
         <label>メールアドレス</label>
-        <input type="email" id="reg-email" placeholder="example@gmail.com">
+        <input type="email" id="reg-email" autocomplete="off" placeholder="example@gmail.com">
       </div>
-      <div class="input-field">
+      <div class="field">
         <label>パスワード</label>
-        <input type="password" id="reg-pass" placeholder="••••••••">
+        <input type="password" id="reg-pass" autocomplete="new-password" placeholder="••••••••">
       </div>
-      <button class="btn" onclick="register()">登録してコード送信</button>
+      
+      <button class="btn" onclick="sendCode()">認証コードを送信</button>
+      <button class="btn btn-outline" onclick="showView('view-home')">戻る</button>
     </div>
 
-    <!-- ログインフォーム -->
-    <div id="login-form" class="form-group">
-      <h2>おかえりなさい！</h2>
-      <p class="sub">登録した情報でログインしてください</p>
+    <!-- 認証コード入力 -->
+    <div id="view-verify" class="view">
+      <h2>コード認証</h2>
+      <p class="sub">メールに届いた6桁のコードを入力してください</p>
       
-      <div class="input-field">
+      <div class="field">
+        <input type="text" id="ver-code" autocomplete="off" placeholder="123456" style="text-align: center; letter-spacing: 4px; font-size: 1.2rem;">
+      </div>
+      
+      <button class="btn" onclick="verifyCode()">次へ進む</button>
+    </div>
+
+    <!-- プロフィール登録（名前・住所） -->
+    <div id="view-profile-setup" class="view">
+      <h2>プロフィール登録</h2>
+      <p class="sub">お名前とご住所を入力してください</p>
+      
+      <div class="field">
+        <label>お名前</label>
+        <input type="text" id="setup-name" autocomplete="off" placeholder="山田 太郎">
+      </div>
+      <div class="field">
+        <label>ご住所</label>
+        <input type="text" id="setup-address" autocomplete="off" placeholder="東京都渋谷区...">
+      </div>
+      
+      <button class="btn" onclick="completeProfile()">登録を完了する</button>
+    </div>
+
+    <!-- ログイン -->
+    <div id="view-login" class="view">
+      <h2>ログイン</h2>
+      <p class="sub">登録したメールアドレスとパスワードを入力</p>
+      
+      <div class="field">
         <label>メールアドレス</label>
-        <input type="email" id="login-email" placeholder="example@gmail.com">
+        <input type="email" id="login-email" autocomplete="off" placeholder="example@gmail.com">
       </div>
-      <div class="input-field">
+      <div class="field">
         <label>パスワード</label>
-        <input type="password" id="login-pass" placeholder="••••••••">
+        <input type="password" id="login-pass" autocomplete="current-password" placeholder="••••••••">
       </div>
+      
       <button class="btn" onclick="login()">ログイン</button>
+      <button class="btn btn-outline" onclick="showView('view-home')">戻る</button>
     </div>
-  </div>
 
-  <!-- 認証コード入力ポップアップ -->
-  <div id="verify-modal" class="modal-overlay">
-    <div class="modal">
-      <h2>メール認証</h2>
-      <p class="sub" style="margin-top: 5px;">メールに届いた6桁のコードを入力してください</p>
-      <div class="input-field" style="margin-top: 15px;">
-        <input type="text" id="ver-code" placeholder="123456" style="text-align: center; font-size: 1.2rem; letter-spacing: 4px;">
+    <!-- マイページ -->
+    <div id="view-mypage" class="view">
+      <h2>マイページ</h2>
+      <p class="sub">ログイン中: <span id="current-user-email" style="color: #fff; font-weight: bold;"></span></p>
+
+      <!-- ロック状態 -->
+      <div id="mypage-lock" style="text-align: center;">
+        <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 15px;">アカウント情報を表示するには認証コードが必要です</p>
+        <button class="btn" onclick="requestMypageCode()">確認用コードをメールに送る</button>
+        
+        <div class="field" style="margin-top: 20px;">
+          <input type="text" id="mypage-code" autocomplete="off" placeholder="届いた6桁のコードを入力" style="text-align: center;">
+        </div>
+        <button class="btn" onclick="unlockProfile()">認証して表示する</button>
       </div>
-      <button class="btn" onclick="verify()">認証する</button>
+
+      <!-- 情報表示エリア（20秒制限） -->
+      <div id="mypage-content" style="display: none;">
+        <div style="text-align: center;">
+          <span class="timer-badge">閲覧制限: 残り <span id="timer-sec">20</span> 秒</span>
+        </div>
+
+        <div class="field">
+          <label>お名前</label>
+          <input type="text" id="my-name" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>ご住所</label>
+          <input type="text" id="my-address" autocomplete="off">
+        </div>
+
+        <button class="btn" onclick="updateProfile()">変更を保存</button>
+      </div>
+
+      <button class="btn btn-outline" onclick="logout()" style="margin-top: 20px;">ログアウト</button>
     </div>
+
   </div>
 
   <script>
-    // あなたのGASのURLをセット済みです！
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxrKnzQ9pn4MkzMARqkqS4g2VE8iAyooI72l6SI53nBEXn0AVleXAfVFEjcJqLHjVYa/exec";
+    
+    let currentEmail = "";
+    let regPassword = "";
+    let timerInterval = null;
 
-    // タブ切り替え処理
-    function switchTab(type) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.form-group').forEach(form => form.classList.remove('active'));
-
-      if (type === 'register') {
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.getElementById('register-form').classList.add('active');
-      } else {
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        document.getElementById('login-form').classList.add('active');
-      }
+    function showView(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
     }
 
-    // 1. 会員登録
-    async function register() {
+    // 1. 仮登録（コード送信）
+    async function sendCode() {
       const email = document.getElementById('reg-email').value;
       const password = document.getElementById('reg-pass').value;
 
-      if(!email || !password) return alert('入力してください');
+      if (!email || !password) return alert('メールアドレスとパスワードを入力してください');
 
-      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'register', email, password }) });
+      currentEmail = email;
+      regPassword = password;
+
+      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'send_code', email, password }) });
       const data = await res.json();
       alert(data.message);
 
-      if (data.status === 'success') {
-        // 成功したらモーダル（ポップアップ）を表示
-        document.getElementById('verify-modal').style.display = 'flex';
-      }
+      if (data.status === 'success') showView('view-verify');
     }
 
-    // 2. コード認証
-    async function verify() {
-      const email = document.getElementById('reg-email').value;
+    // 2. コード検証
+    async function verifyCode() {
       const code = document.getElementById('ver-code').value;
+      if (!code) return alert('認証コードを入力してください');
 
-      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'verify', email, code }) });
+      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'verify_code', email: currentEmail, code }) });
       const data = await res.json();
       alert(data.message);
 
-      if (data.status === 'success') {
-        document.getElementById('verify-modal').style.display = 'none';
-        switchTab('login'); // 認証完了したらログインタブへ！
-      }
+      if (data.status === 'success') showView('view-profile-setup');
     }
 
-    // 3. ログイン
+    // 3. 本登録完了
+    async function completeProfile() {
+      const name = document.getElementById('setup-name').value;
+      const address = document.getElementById('setup-address').value;
+
+      if (!name || !address) return alert('名前と住所を入力してください');
+
+      const res = await fetch(GAS_URL, { 
+        method: 'POST', 
+        body: JSON.stringify({ action: 'complete_profile', email: currentEmail, password: regPassword, name, address }) 
+      });
+      const data = await res.json();
+      alert(data.message);
+
+      if (data.status === 'success') showView('view-login');
+    }
+
+    // 4. ログイン
     async function login() {
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-pass').value;
 
-      if(!email || !password) return alert('入力してください');
+      if (!email || !password) return alert('メールアドレスとパスワードを入力してください');
 
       const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'login', email, password }) });
       const data = await res.json();
       alert(data.message);
+
+      if (data.status === 'success') {
+        currentEmail = email;
+        document.getElementById('current-user-email').innerText = email;
+        showView('view-mypage');
+      }
+    }
+
+    // 5-A. マイページ用コードの要求
+    async function requestMypageCode() {
+      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'request_mypage_code', email: currentEmail }) });
+      const data = await res.json();
+      alert(data.message);
+    }
+
+    // 5-B. マイページ情報のロック解除（20秒タイマー）
+    async function unlockProfile() {
+      const code = document.getElementById('mypage-code').value;
+      if (!code) return alert('認証コードを入力してください');
+
+      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'get_profile', email: currentEmail, code }) });
+      const data = await res.json();
+
+      if (data.status === 'success') {
+        document.getElementById('mypage-lock').style.display = 'none';
+        document.getElementById('mypage-content').style.display = 'block';
+        document.getElementById('my-name').value = data.data.name;
+        document.getElementById('my-address').value = data.data.address;
+
+        let timeLeft = 20;
+        document.getElementById('timer-sec').innerText = timeLeft;
+        
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          document.getElementById('timer-sec').innerText = timeLeft;
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert('20秒が経過したため情報を非表示にしました');
+            document.getElementById('mypage-content').style.display = 'none';
+            document.getElementById('mypage-lock').style.display = 'block';
+            document.getElementById('mypage-code').value = '';
+          }
+        }, 1000);
+
+      } else {
+        alert(data.message);
+      }
+    }
+
+    // 6. プロフィール更新
+    async function updateProfile() {
+      const name = document.getElementById('my-name').value;
+      const address = document.getElementById('my-address').value;
+
+      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'update_profile', email: currentEmail, name, address }) });
+      const data = await res.json();
+      alert(data.message);
+    }
+
+    // ログアウト
+    function logout() {
+      clearInterval(timerInterval);
+      currentEmail = "";
+      document.getElementById('mypage-content').style.display = 'none';
+      document.getElementById('mypage-lock').style.display = 'block';
+      document.getElementById('mypage-code').value = '';
+      showView('view-home');
     }
   </script>
 </body>
