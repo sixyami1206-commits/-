@@ -3,205 +3,288 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>デリバリー 🥡 Rabbit</title>
+  <title>Uber Eats 風 - デリバリー Rabbit 🥡</title>
   <style>
     :root {
-      --bg-main: #0e131f;
-      --bg-card: #1a2235;
-      --bg-input: #121826;
-      --accent-green: #06c167; /* Uber風グリーン */
-      --accent-hover: #049e53;
-      --accent-orange: #ff6b00;
-      --text-white: #ffffff;
-      --text-gray: #a0aec0;
-      --border-color: #2d3748;
+      --bg-black: #000000;
+      --bg-card: #141414;
+      --bg-hover: #1f1f1f;
+      --bg-input: #242424;
+      --uber-green: #06C167;
+      --uber-green-hover: #049E53;
+      --text-main: #FFFFFF;
+      --text-sub: #A0A0A0;
+      --border-color: #2D2D2D;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg-main); color: var(--text-white); padding-bottom: 90px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'UberMoveText', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-black); color: var(--text-main); padding-bottom: 100px; }
 
-    /* ヘッダー */
+    /* Uber Eats風 ヘッダー */
     header {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(14, 19, 31, 0.95);
-      backdrop-filter: blur(8px);
-      padding: 12px 20px;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(12px);
+      padding: 14px 24px;
       display: flex; justify-content: space-between; align-items: center;
       border-bottom: 1px solid var(--border-color);
     }
-    .brand { font-size: 1.4rem; font-weight: 800; color: var(--text-white); display: flex; align-items: center; gap: 6px; }
-    .brand span { color: var(--accent-green); }
-    
-    .header-btns { display: flex; gap: 10px; }
-    .btn-header { background: var(--bg-card); color: var(--text-white); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
-    .btn-header.primary { background: var(--accent-green); border: none; color: #000; }
+    .brand-logo { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .brand-logo span { color: var(--uber-green); }
 
-    .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+
+    /* ユーザーIDバッジ */
+    .user-badge {
+      background: #1e293b; border: 1px solid #334155; padding: 6px 12px;
+      border-radius: 20px; font-size: 0.8rem; font-weight: 700; color: var(--uber-green);
+      display: none; align-items: center; gap: 6px;
+    }
+
+    .btn-icon-cart {
+      background: var(--uber-green); color: #000; border: none;
+      padding: 8px 16px; border-radius: 30px; font-weight: 800; font-size: 0.9rem;
+      cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s;
+    }
+    .btn-icon-cart:hover { background: var(--uber-green-hover); }
+
+    .btn-nav {
+      background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color);
+      padding: 8px 16px; border-radius: 30px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s;
+    }
+    .btn-nav:hover { background: var(--bg-hover); }
+
+    .container { max-width: 680px; margin: 0 auto; padding: 20px 15px; }
 
     /* 検索バー */
-    .search-wrapper { position: relative; margin-bottom: 15px; }
+    .search-container { position: relative; margin-bottom: 25px; }
     .search-input {
-      width: 100%; padding: 12px 16px 12px 42px;
+      width: 100%; padding: 16px 20px 16px 50px;
       background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: 25px; color: var(--text-white); font-size: 0.95rem; outline: none;
+      border-radius: 35px; color: var(--text-main); font-size: 1rem; outline: none; transition: 0.2s;
     }
-    .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-gray); }
+    .search-input:focus { border-color: var(--uber-green); box-shadow: 0 0 10px rgba(6, 193, 103, 0.2); }
+    .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: var(--text-sub); }
 
-    /* 店舗・商品カード */
-    .shop-section { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 20px; overflow: hidden; }
-    .shop-header { padding: 14px 18px; background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-    .shop-name { font-size: 1.1rem; font-weight: 700; color: var(--text-white); }
-    .shop-shipping { font-size: 0.8rem; color: var(--accent-orange); background: rgba(255,107,0,0.1); padding: 4px 8px; border-radius: 12px; }
+    /* 店舗カード */
+    .shop-card { background: var(--bg-card); border-radius: 18px; border: 1px solid var(--border-color); margin-bottom: 24px; overflow: hidden; }
+    .shop-head { padding: 18px 22px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+    .shop-title { font-size: 1.2rem; font-weight: 800; }
+    .shop-fee { font-size: 0.8rem; font-weight: 700; color: #ff9800; background: rgba(255,152,0,0.15); padding: 4px 10px; border-radius: 12px; }
 
-    .product-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .product-item:last-child { border-bottom: none; }
-    .product-detail h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
-    .product-detail p { font-size: 0.85rem; color: var(--text-gray); }
+    /* 商品アイテム */
+    .product-row { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .product-row:last-child { border-bottom: none; }
+    .product-info h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+    .product-info p { font-size: 0.95rem; color: var(--text-sub); font-weight: 600; }
 
-    .add-btn { background: var(--accent-green); color: #000; border: none; width: 32px; height: 32px; border-radius: 50%; font-weight: bold; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .btn-add { background: var(--uber-green); color: #000; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.4rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .btn-add:hover { background: var(--uber-green-hover); transform: scale(1.1); }
 
-    /* 下部フロート決済バー */
-    .float-cart-bar {
+    /* フローティングカートバー */
+    .floating-cart {
       position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--bg-card); border-top: 1px solid var(--border-color);
-      padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;
-      z-index: 90;
+      background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px);
+      border-top: 1px solid var(--border-color);
+      padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 90;
     }
-    .cart-info-text { font-size: 0.85rem; color: var(--text-gray); }
-    .cart-total-price { font-size: 1.2rem; font-weight: 800; color: var(--text-white); }
-    .btn-checkout { background: var(--accent-green); color: #000; border: none; padding: 12px 24px; border-radius: 25px; font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+    .cart-price { font-size: 1.3rem; font-weight: 900; }
+    .btn-primary-action { background: var(--uber-green); color: #000; border: none; padding: 14px 32px; border-radius: 30px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+    .btn-primary-action:hover { background: var(--uber-green-hover); }
 
-    /* モーダル / 表示エリア */
-    .view-page { display: none; }
-    .view-page.active { display: block; }
-    
-    .card-box { background: var(--bg-card); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color); margin-bottom: 15px; }
-    .input-group { margin-bottom: 14px; }
-    .input-group label { font-size: 0.8rem; color: var(--text-gray); display: block; margin-bottom: 5px; }
-    .input-group input, .input-group textarea {
-      width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border-color);
-      border-radius: 8px; color: var(--text-white); font-size: 0.9rem;
+    /* 画面切り替え */
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+
+    .card-box { background: var(--bg-card); border-radius: 20px; padding: 24px; border: 1px solid var(--border-color); margin-bottom: 20px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { font-size: 0.85rem; color: var(--text-sub); display: block; margin-bottom: 8px; font-weight: 600; }
+    .form-group input, .form-group textarea {
+      width: 100%; padding: 14px 16px; background: var(--bg-input); border: 1px solid var(--border-color);
+      border-radius: 12px; color: var(--text-main); font-size: 0.95rem; outline: none;
     }
-    .btn-action { width: 100%; background: var(--accent-green); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 8px; }
-    .btn-secondary { width: 100%; background: transparent; color: var(--text-gray); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+    .form-group input:focus { border-color: var(--uber-green); }
+
+    .btn-full { width: 100%; background: var(--uber-green); color: #000; border: none; padding: 15px; border-radius: 30px; font-weight: 800; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+    .btn-outline { width: 100%; background: transparent; color: var(--text-main); border: 1px solid var(--border-color); padding: 13px; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+
+    /* 支払いラジオボタン */
+    .pay-selector { display: flex; gap: 12px; margin-top: 6px; }
+    .pay-card { flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; text-align: center; cursor: pointer; font-weight: 700; }
+    .pay-card input { display: none; }
+    .pay-card:has(input:checked) { border-color: var(--uber-green); background: rgba(6, 193, 103, 0.15); color: var(--uber-green); }
+
+    /* 注文履歴リスト */
+    .history-card { background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+    .history-head { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-sub); }
+
+    /* ローディング */
+    #loader { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; justify-content: center; align-items: center; flex-direction: column; gap: 15px; }
+    .spin { width: 50px; height: 50px; border: 4px solid var(--border-color); border-top-color: var(--uber-green); border-radius: 50%; animation: sp 0.8s linear infinite; }
+    @keyframes sp { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
+  <!-- ローディング表示 -->
+  <div id="loader">
+    <div class="spin"></div>
+    <div id="loader-msg" style="font-weight: 800;">処理中...</div>
+  </div>
+
   <header>
-    <div class="brand">デリバリー <span>Rabbit 🥡</span></div>
-    <div class="header-btns">
-      <button id="auth-btn" class="btn-header" onclick="showPage('page-auth')">ログイン</button>
-      <button class="btn-header" onclick="showPage('page-support')">サポート</button>
+    <div class="brand-logo" onclick="showPage('page-menu')">Uber <span>Eats Rabbit 🥡</span></div>
+    
+    <div class="header-actions">
+      <!-- ログイン時のユーザーID表示 -->
+      <div id="user-badge" class="user-badge">
+        <span>👤</span> <span id="user-id-text">ID: ---</span>
+      </div>
+
+      <!-- 右上固定のカートボタン -->
+      <button class="btn-icon-cart" onclick="goToCheckout()">
+        🛒 <span id="header-cart-count">0</span>
+      </button>
+
+      <button id="btn-login-nav" class="btn-nav" onclick="showPage('page-auth')">ログイン</button>
+      <button id="btn-history-nav" class="btn-nav" onclick="loadOrderHistory()" style="display:none;">注文履歴</button>
     </div>
   </header>
 
   <div class="container">
 
-    <!-- ① メインメニュー画面 -->
-    <div id="page-menu" class="view-page active">
-      <div class="search-wrapper">
+    <!-- ① 商品メニュー -->
+    <div id="page-menu" class="page-view active">
+      <div class="search-container">
         <span class="search-icon">🔍</span>
-        <input type="text" id="search-input" class="search-input" placeholder="お店や料理名で検索..." oninput="filterProducts()">
+        <input type="text" id="search-box" class="search-input" placeholder="お気に入りの料理やお店を検索..." oninput="filterProducts()">
       </div>
-
-      <div id="product-container">商品データを読み込んでいます...</div>
+      <div id="product-list">商品を読み込んでいます...</div>
     </div>
 
-    <!-- ② 注文確認・チェックアウト画面 -->
-    <div id="page-checkout" class="view-page">
+    <!-- ② チェックアウト（注文確認） -->
+    <div id="page-checkout" class="page-view">
       <div class="card-box">
-        <h2 style="margin-bottom: 15px;">🛍️ ご注文内容の確認</h2>
-        <div id="checkout-cart-items" style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-gray);"></div>
-        <hr style="border-color: var(--border-color); margin-bottom: 15px;">
+        <h2 style="margin-bottom: 20px;">🛍️ カートのご確認</h2>
+        <div id="cart-summary" style="margin-bottom: 15px; color: var(--text-sub);"></div>
+        <hr style="border-color: var(--border-color); margin-bottom: 20px;">
 
-        <div class="input-group">
+        <div class="form-group">
           <label>お名前</label>
-          <input type="text" id="order-name" placeholder="山田 太郎">
+          <input type="text" id="ord-name" placeholder="山田 太郎">
         </div>
-        <div class="input-group">
+        <div class="form-group">
           <label>お届け先住所</label>
-          <input type="text" id="order-address" placeholder="東京都...">
+          <input type="text" id="ord-address" placeholder="東京都...">
         </div>
-        <div class="input-group">
+        <div class="form-group">
           <label>メールアドレス</label>
-          <input type="email" id="order-email" placeholder="example@gmail.com">
+          <input type="email" id="ord-email" placeholder="example@gmail.com">
         </div>
 
-        <button class="btn-action" onclick="submitOrder()">注文を確定する 🛵💨</button>
-        <button class="btn-secondary" onclick="showPage('page-menu')">メニューに戻る</button>
+        <div class="form-group">
+          <label>お支払い方法</label>
+          <div class="pay-selector">
+            <label class="pay-card">
+              <input type="radio" name="payment" value="cod" checked>
+              💵 代金引換
+            </label>
+            <label class="pay-card">
+              <input type="radio" name="payment" value="paypay">
+              💳 PayPay
+            </label>
+          </div>
+        </div>
+
+        <button class="btn-full" onclick="sendOrderAuthCode()">認証コードを送信して次へ ➔</button>
+        <button class="btn-outline" onclick="showPage('page-menu')">買い物を続ける</button>
       </div>
     </div>
 
-    <!-- ③ ログイン・会員登録 -->
-    <div id="page-auth" class="view-page">
+    <!-- ②-2 注文用 認証コード入力 -->
+    <div id="page-verify-order" class="page-view">
+      <div class="card-box" style="text-align: center;">
+        <h2>🔐 注文用コードの確認</h2>
+        <p style="font-size: 0.85rem; color: var(--text-sub); margin-top: 10px;">
+          メールアドレスに送信された **6桁の認証コード** を入力してください。<br>（※ログイン状態でも不正防止のため必須です）
+        </p>
+
+        <div class="form-group" style="margin-top: 25px; text-align: left;">
+          <label>6桁の認証コード</label>
+          <input type="text" id="ord-auth-code" placeholder="123456" style="text-align: center; font-size: 1.4rem; letter-spacing: 6px;">
+        </div>
+
+        <button class="btn-full" onclick="submitOrderFinal()">注文を確定する 🛵💨</button>
+        <button class="btn-outline" onclick="showPage('page-checkout')">戻る</button>
+      </div>
+    </div>
+
+    <!-- ③ 注文履歴画面 -->
+    <div id="page-history" class="page-view">
+      <div class="card-box">
+        <h2>📜 ご注文履歴</h2>
+        <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 20px;">過去に注文した商品リストの一覧です。</p>
+        <div id="history-container">履歴データを取得中...</div>
+        <button class="btn-outline" onclick="showPage('page-menu')">メニューへ戻る</button>
+      </div>
+    </div>
+
+    <!-- ④ ログイン・会員登録 -->
+    <div id="page-auth" class="page-view">
       <div class="card-box">
         <h2>👤 会員ログイン</h2>
-        <div class="input-group" style="margin-top: 15px;">
+        <div class="form-group" style="margin-top: 15px;">
           <label>メールアドレス</label>
-          <input type="email" id="auth-email">
+          <input type="email" id="login-email">
         </div>
-        <div class="input-group">
+        <div class="form-group">
           <label>パスワード</label>
-          <input type="password" id="auth-pass">
+          <input type="password" id="login-pass">
         </div>
-        <button class="btn-action" onclick="login()">ログイン</button>
+        <button class="btn-full" onclick="login()">ログイン</button>
 
-        <hr style="border-color: var(--border-color); margin: 20px 0;">
+        <hr style="border-color: var(--border-color); margin: 30px 0;">
 
-        <h4>新規会員登録（メール認証）</h4>
-        <button class="btn-secondary" onclick="sendAuthCode()">認証コードを送信</button>
+        <h2>✨ 新規会員登録</h2>
+        <div class="form-group" style="margin-top: 15px;">
+          <label>登録用メールアドレス</label>
+          <input type="email" id="reg-email">
+        </div>
+        <button class="btn-outline" onclick="sendRegCode()">認証コードを送信</button>
 
-        <div id="register-step2" style="display: none; margin-top: 15px;">
-          <div class="input-group">
-            <label>認証コード</label>
-            <input type="text" id="auth-code" placeholder="6桁">
+        <div id="reg-step2" style="display: none; margin-top: 15px;">
+          <div class="form-group">
+            <label>認証コード (6桁)</label>
+            <input type="text" id="reg-code">
           </div>
-          <div class="input-group">
+          <div class="form-group">
+            <label>パスワード</label>
+            <input type="password" id="reg-pass">
+          </div>
+          <div class="form-group">
             <label>お名前</label>
             <input type="text" id="reg-name">
           </div>
-          <div class="input-group">
+          <div class="form-group">
             <label>お届け先住所</label>
             <input type="text" id="reg-address">
           </div>
-          <button class="btn-action" onclick="completeRegister()">登録完了</button>
+          <button class="btn-full" onclick="completeRegister()">登録を完了する</button>
         </div>
 
-        <button class="btn-secondary" onclick="showPage('page-menu')">戻る</button>
-      </div>
-    </div>
-
-    <!-- ④ サポート画面 -->
-    <div id="page-support" class="view-page">
-      <div class="card-box">
-        <h2>💬 カスタマーサポート</h2>
-        <div class="input-group" style="margin-top:15px;">
-          <label>お名前</label>
-          <input type="text" id="supp-name">
-        </div>
-        <div class="input-group">
-          <label>メールアドレス</label>
-          <input type="email" id="supp-email">
-        </div>
-        <div class="input-group">
-          <label>お問い合わせ内容</label>
-          <textarea id="supp-msg" rows="4"></textarea>
-        </div>
-        <button class="btn-action" onclick="sendSupport()">送信する</button>
-        <button class="btn-secondary" onclick="showPage('page-menu')">戻る</button>
+        <button class="btn-outline" onclick="showPage('page-menu')" style="margin-top: 15px;">戻る</button>
       </div>
     </div>
 
   </div>
 
-  <!-- 下部固定のフローティングカートバー -->
-  <div class="float-cart-bar">
+  <!-- 下部フローティングバー -->
+  <div class="floating-cart">
     <div>
-      <div class="cart-info-text"><span id="cart-count">0</span> 点の注文</div>
-      <div class="cart-total-price" id="cart-total">0円</div>
+      <div style="font-size: 0.8rem; color: var(--text-sub);"><span id="cart-count-bar">0</span> 点の商品</div>
+      <div class="cart-price" id="cart-total-bar">0円</div>
     </div>
-    <button class="btn-checkout" onclick="goToCheckout()">注文手続きへ ➔</button>
+    <button class="btn-primary-action" onclick="goToCheckout()">注文手続きへ ➔</button>
   </div>
 
   <script>
@@ -209,30 +292,40 @@
 
     let products = [];
     let cart = [];
+    let currentUser = null;
 
     window.onload = loadProducts;
 
     function showPage(pageId) {
-      document.querySelectorAll('.view-page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
       document.getElementById(pageId).classList.add('active');
+      window.scrollTo(0,0);
+    }
+
+    function showLoader(msg) {
+      document.getElementById('loader-msg').innerText = msg;
+      document.getElementById('loader').style.display = 'flex';
+    }
+
+    function hideLoader() {
+      document.getElementById('loader').style.display = 'none';
     }
 
     async function loadProducts() {
       try {
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'get_products' }) });
         const data = await res.json();
-
         if (data.status === 'success') {
           products = data.products;
-          renderMenu(products);
+          renderProducts(products);
         }
       } catch (e) {
-        document.getElementById('product-container').innerText = "通信エラーが発生しました。";
+        document.getElementById('product-list').innerText = "商品データの読み込みに失敗しました。";
       }
     }
 
-    function renderMenu(items) {
-      const container = document.getElementById('product-container');
+    function renderProducts(items) {
+      const container = document.getElementById('product-list');
       container.innerHTML = "";
 
       const shops = {};
@@ -245,35 +338,35 @@
         const shop = shops[shopName];
         const shipping = shop[0].shipping;
 
-        let shopHtml = `
-          <div class="shop-section">
-            <div class="shop-header">
-              <div class="shop-name">🏪 ${shopName}</div>
-              <div class="shop-shipping">送料 ${shipping}円</div>
+        let html = `
+          <div class="shop-card">
+            <div class="shop-head">
+              <div class="shop-title">🏪 ${shopName}</div>
+              <div class="shop-fee">送料 ${shipping}円</div>
             </div>
         `;
 
         shop.forEach(p => {
-          shopHtml += `
-            <div class="product-item">
-              <div class="product-detail">
+          html += `
+            <div class="product-row">
+              <div class="product-info">
                 <h4>${p.name}</h4>
                 <p>${p.price}円</p>
               </div>
-              <button class="add-btn" onclick="addToCart(${p.id})">＋</button>
+              <button class="btn-add" onclick="addToCart(${p.id})">＋</button>
             </div>
           `;
         });
 
-        shopHtml += `</div>`;
-        container.innerHTML += shopHtml;
+        html += `</div>`;
+        container.innerHTML += html;
       }
     }
 
     function filterProducts() {
-      const q = document.getElementById('search-input').value.toLowerCase();
+      const q = document.getElementById('search-box').value.toLowerCase();
       const filtered = products.filter(p => p.name.toLowerCase().includes(q) || p.shop.toLowerCase().includes(q));
-      renderMenu(filtered);
+      renderProducts(filtered);
     }
 
     function addToCart(id) {
@@ -285,93 +378,199 @@
     }
 
     function updateCartUI() {
-      document.getElementById('cart-count').innerText = cart.length;
+      const count = cart.length;
+      document.getElementById('header-cart-count').innerText = count;
+      document.getElementById('cart-count-bar').innerText = count;
+
       const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-      const shipping = cart.length > 0 ? Math.max(...cart.map(i => i.shipping)) : 0;
-      document.getElementById('cart-total').innerText = (subtotal + shipping) + "円";
+      const shipping = count > 0 ? Math.max(...cart.map(i => i.shipping)) : 0;
+      document.getElementById('cart-total-bar').innerText = (subtotal + shipping) + "円";
     }
 
     function goToCheckout() {
       if (cart.length === 0) return alert('カートに商品を入れてください！');
-      
-      const itemsContainer = document.getElementById('checkout-cart-items');
-      itemsContainer.innerHTML = cart.map(i => `<div>・${i.name} (${i.price}円)</div>`).join('');
-      
+
+      const summary = document.getElementById('cart-summary');
+      summary.innerHTML = cart.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>${i.name}</span><strong>${i.price}円</strong></div>`).join('');
+
       showPage('page-checkout');
     }
 
-    async function submitOrder() {
-      const name = document.getElementById('order-name').value;
-      const address = document.getElementById('order-address').value;
-      const email = document.getElementById('order-email').value;
+    // 注文用コード送信
+    async function sendOrderAuthCode() {
+      const name = document.getElementById('ord-name').value;
+      const address = document.getElementById('ord-address').value;
+      const email = document.getElementById('ord-email').value;
 
       if (!name || !address || !email) return alert('すべての項目を入力してください');
+
+      showLoader("認証コードを送信中...");
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'send_order_code', email, name })
+        });
+        const data = await res.json();
+        hideLoader();
+        alert(data.message);
+        if (data.status === 'success') {
+          showPage('page-verify-order');
+        }
+      } catch (e) {
+        hideLoader();
+        alert("送信エラーが発生しました。");
+      }
+    }
+
+    // 最終注文確定
+    async function submitOrderFinal() {
+      const name = document.getElementById('ord-name').value;
+      const address = document.getElementById('ord-address').value;
+      const email = document.getElementById('ord-email').value;
+      const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+      const code = document.getElementById('ord-auth-code').value;
+
+      if (!code) return alert('認証コードを入力してください');
 
       const itemsText = cart.map(i => i.name).join(', ');
       const subtotal = cart.reduce((sum, i) => sum + i.price, 0);
       const shipping = Math.max(...cart.map(i => i.shipping));
 
-      const res = await fetch(GAS_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'create_order', name, address, email, items: itemsText, subtotal, shipping })
-      });
+      showLoader("注文確定中・メール送信中...");
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'verify_and_create_order',
+            name, address, email, paymentMethod, code,
+            items: itemsText, subtotal, shipping
+          })
+        });
+        const data = await res.json();
+        hideLoader();
 
-      const data = await res.json();
-      alert(`${data.message}\n注文ID: ${data.orderId}`);
-      if (data.status === 'success') {
-        cart = [];
-        updateCartUI();
-        showPage('page-menu');
+        alert(`${data.message}\n注文ID: ${data.orderId}`);
+        if (data.status === 'success') {
+          cart = [];
+          updateCartUI();
+          showPage('page-menu');
+        }
+      } catch (e) {
+        hideLoader();
+        alert("注文処理中にエラーが発生しました。");
       }
     }
 
-    async function sendSupport() {
-      const name = document.getElementById('supp-name').value;
-      const email = document.getElementById('supp-email').value;
-      const message = document.getElementById('supp-msg').value;
+    // ログイン処理
+    async function login() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-pass').value;
 
-      const res = await fetch(GAS_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'send_support', name, email, message })
-      });
+      showLoader("ログイン中...");
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'login', email, password })
+        });
+        const data = await res.json();
+        hideLoader();
 
-      const data = await res.json();
-      alert(data.message);
-      if (data.status === 'success') showPage('page-menu');
+        alert(data.message);
+        if (data.status === 'success') {
+          currentUser = data.user;
+
+          // ユーザーID表示 ＋ ヘッダーボタン切り替え
+          document.getElementById('user-id-text').innerText = `${currentUser.userId} (${currentUser.name} 様)`;
+          document.getElementById('user-badge').style.display = 'flex';
+          document.getElementById('btn-login-nav').style.display = 'none';
+          document.getElementById('btn-history-nav').style.display = 'block';
+
+          // 注文フォームの自動入力
+          document.getElementById('ord-name').value = currentUser.name;
+          document.getElementById('ord-address').value = currentUser.address;
+          document.getElementById('ord-email').value = currentUser.email;
+
+          showPage('page-menu');
+        }
+      } catch (e) {
+        hideLoader();
+        alert("ログインエラー");
+      }
     }
 
-    // 会員登録関連
-    async function sendAuthCode() {
-      const email = document.getElementById('auth-email').value;
+    // 注文履歴読み込み
+    async function loadOrderHistory() {
+      if (!currentUser) return alert("ログインしてください");
+
+      showPage('page-history');
+      showLoader("注文履歴を取得中...");
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'get_order_history', email: currentUser.email })
+        });
+        const data = await res.json();
+        hideLoader();
+
+        const container = document.getElementById('history-container');
+        if (data.history.length === 0) {
+          container.innerHTML = "<p>過去の注文履歴はありません。</p>";
+          return;
+        }
+
+        container.innerHTML = data.history.map(h => `
+          <div class="history-card">
+            <div class="history-head">
+              <span>🆔 ${h.orderId}</span>
+              <span>📅 ${h.date}</span>
+            </div>
+            <div style="font-weight: bold; margin-bottom: 6px;">🛒 ${h.items}</div>
+            <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--uber-green);">
+              <span>${h.payment}</span>
+              <strong>合計: ${h.total}円</strong>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (e) {
+        hideLoader();
+        document.getElementById('history-container').innerText = "履歴取得に失敗しました。";
+      }
+    }
+
+    // 会員登録コード送信
+    async function sendRegCode() {
+      const email = document.getElementById('reg-email').value;
+      if (!email) return alert('メールアドレスを入力してください');
+
+      showLoader("認証コード送信中...");
       const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'send_code', email }) });
       const data = await res.json();
+      hideLoader();
       alert(data.message);
-      if (data.status === 'success') document.getElementById('register-step2').style.display = 'block';
+      if (data.status === 'success') document.getElementById('reg-step2').style.display = 'block';
     }
 
+    // 会員登録完了
     async function completeRegister() {
-      const email = document.getElementById('auth-email').value;
-      const password = document.getElementById('auth-pass').value;
-      const code = document.getElementById('auth-code').value;
+      const email = document.getElementById('reg-email').value;
+      const code = document.getElementById('reg-code').value;
+      const password = document.getElementById('reg-pass').value;
       const name = document.getElementById('reg-name').value;
       const address = document.getElementById('reg-address').value;
 
+      showLoader("登録処理中...");
       const vRes = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'verify_code', email, code }) });
       const vData = await vRes.json();
-      if (vData.status !== 'success') return alert(vData.message);
+      if (vData.status !== 'success') {
+        hideLoader();
+        return alert(vData.message);
+      }
 
       const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'complete_profile', email, password, name, address }) });
       const data = await res.json();
-      alert(data.message);
-      if (data.status === 'success') showPage('page-menu');
-    }
-
-    async function login() {
-      const email = document.getElementById('auth-email').value;
-      const password = document.getElementById('auth-pass').value;
-
-      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'login', email, password }) });
-      const data = await res.json();
+      hideLoader();
       alert(data.message);
       if (data.status === 'success') showPage('page-menu');
     }
