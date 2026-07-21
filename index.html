@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Uber Eats 風 - デリバリー Rabbit 🥡</title>
+  <title>デリバリー Rabbit 🥡</title>
   <style>
     :root {
       --bg-light: #F8F9FA;
@@ -61,30 +61,21 @@
     }
     .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-sub); }
 
-    /* 店名ごとのアコーディオンカード */
+    /* 店舗カード（1つの店舗につき1つ） */
     .shop-card {
       background: var(--bg-white);
       border-radius: 16px;
       border: 1px solid var(--border-color);
       margin-bottom: 16px;
-      overflow: hidden;
+      padding: 18px 20px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-    }
-
-    /* 店舗のヘッダー部分（クリック可能） */
-    .shop-header-btn {
-      width: 100%;
-      background: var(--bg-white);
-      border: none;
-      padding: 16px 20px;
-      text-align: left;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
       transition: background 0.2s;
     }
-    .shop-header-btn:hover { background: #FAFAFA; }
+    .shop-card:hover { background: #FAFAFA; }
 
     .shop-title-area { display: flex; flex-direction: column; gap: 4px; }
     .shop-name { font-size: 1.15rem; font-weight: 800; color: var(--text-dark); }
@@ -92,38 +83,23 @@
 
     .shop-header-right { display: flex; align-items: center; gap: 12px; }
     .shop-fee { font-size: 0.8rem; font-weight: 700; color: #E65100; background: #FFF3E0; padding: 4px 10px; border-radius: 12px; }
-    .arrow-icon { font-size: 0.9rem; color: var(--text-sub); transition: transform 0.3s ease; }
+    .arrow-icon { font-size: 1rem; color: var(--text-sub); font-weight: bold; }
 
-    /* 開いている時の矢印回転 */
-    .shop-card.open .arrow-icon { transform: rotate(180deg); }
-
-    /* アコーディオンの中身 */
-    .shop-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out;
-      background: var(--bg-white);
-      border-top: 1px solid transparent;
-    }
-    .shop-card.open .shop-content {
-      border-top: 1px solid var(--border-color);
-    }
-
-    /* 商品行 */
+    /* 店舗詳細ページ内の商品行 */
     .product-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 14px 20px;
+      padding: 16px 0;
       border-bottom: 1px solid var(--border-color);
     }
     .product-row:last-child { border-bottom: none; }
-    .product-info h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; }
-    .product-info p { font-size: 0.88rem; color: var(--text-sub); font-weight: 600; }
+    .product-info h4 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .product-info p { font-size: 0.9rem; color: var(--text-sub); font-weight: 600; }
 
     .btn-add {
       background: var(--uber-green); color: #FFF; border: none;
-      width: 34px; height: 34px; border-radius: 50%;
+      width: 36px; height: 36px; border-radius: 50%;
       font-size: 1.2rem; font-weight: bold; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: background 0.2s;
@@ -190,16 +166,27 @@
 
   <div class="container">
 
-    <!-- ① メニュー画面（店舗ごと折りたたみ形式） -->
+    <!-- ① 店舗一覧画面 -->
     <div id="page-menu" class="page-view active">
       <div class="search-container">
         <span class="search-icon">🔍</span>
         <input type="text" id="search-box" class="search-input" placeholder="店舗名や商品を検索..." oninput="filterProducts()">
       </div>
-      <div id="product-list">商品データを取得中...</div>
+      <div id="shop-list">店舗データを取得中...</div>
     </div>
 
-    <!-- ② 注文確認 -->
+    <!-- 別ページ：店舗詳細（特定店舗の商品一覧）画面 -->
+    <div id="page-shop-detail" class="page-view">
+      <button class="btn-outline" onclick="showPage('page-menu')" style="margin-bottom: 15px; width: auto; padding: 8px 16px;">← 店舗一覧に戻る</button>
+      <div class="card-box">
+        <h2 id="detail-shop-name" style="margin-bottom: 6px;">---</h2>
+        <div id="detail-shop-fee" style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px;">---</div>
+        <hr style="border-color: var(--border-color); margin-bottom: 15px;">
+        <div id="detail-product-list"></div>
+      </div>
+    </div>
+
+    <!-- ② 注文確認画面 -->
     <div id="page-checkout" class="page-view">
       <div class="card-box">
         <h2 style="margin-bottom: 15px;">🛍️ カートの確認</h2>
@@ -318,7 +305,7 @@
   </div>
 
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyXHAia7M-SLAz9KIPIwCt20s4t95V8AW0BfcRrM5wFsgCVdj0ViUlN9yKlslFjJla9/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzmJ11twqRSpmty1RRrneRvN7lZcJPOnQ3wdCVXCIAZLck-7dqpa0PX2kQlR-jjbChh/exec";
 
     let products = [];
     let cart = [];
@@ -341,27 +328,30 @@
       document.getElementById('loader').style.display = 'none';
     }
 
-    // 商品一覧の取得
+    // 商品一覧の取得（新しいGAS URLを使用）
     async function loadProducts() {
+      showLoader("商品データを取得中...");
       try {
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'get_products' }) });
         const data = await res.json();
+        hideLoader();
         if (data.status === 'success') {
           products = data.products;
-          renderProducts(products);
+          renderShops(products);
         }
       } catch (e) {
-        document.getElementById('product-list').innerText = "商品データの読み込みに失敗しました。";
+        hideLoader();
+        document.getElementById('shop-list').innerText = "商品データの読み込みに失敗しました。";
       }
     }
 
-    // 店名ごとにまとめて、代表商品1点表示＋クリックでアコーディオン展開する描画処理
-    function renderProducts(items) {
-      const container = document.getElementById('product-list');
+    // 店舗一覧のレンダリング（クリックすると別ページへ遷移）
+    function renderShops(items) {
+      const container = document.getElementById('shop-list');
       container.innerHTML = "";
 
       if (items.length === 0) {
-        container.innerHTML = "<p style='text-align:center;'>該当する商品・店舗がありません。</p>";
+        container.innerHTML = "<p style='text-align:center;'>該当する店舗がありません。</p>";
         return;
       }
 
@@ -372,47 +362,20 @@
         shops[p.shop].push(p);
       });
 
-      let shopIndex = 0;
       for (const shopName in shops) {
-        shopIndex++;
         const shopProducts = shops[shopName];
         const shipping = shopProducts[0].shipping;
-        const firstProduct = shopProducts[0]; // 代表商品（トップに表示）
+        const firstProduct = shopProducts[0];
 
-        const cardId = `shop-card-${shopIndex}`;
-        const contentId = `shop-content-${shopIndex}`;
-
-        let html = `
-          <div class="shop-card" id="${cardId}">
-            <!-- クリックで開閉するヘッダー部分 -->
-            <button class="shop-header-btn" onclick="toggleShop('${cardId}', '${contentId}')">
-              <div class="shop-title-area">
-                <div class="shop-name">🏪 ${shopName}</div>
-                <div class="shop-preview">おすすめ: ${firstProduct.name} (${firstProduct.price}円)</div>
-              </div>
-              <div class="shop-header-right">
-                <span class="shop-fee">送料 ${shipping}円</span>
-                <span class="arrow-icon">▼</span>
-              </div>
-            </button>
-
-            <!-- 開いたときに表示される全商品リスト -->
-            <div class="shop-content" id="${contentId}">
-        `;
-
-        shopProducts.forEach(p => {
-          html += `
-            <div class="product-row">
-              <div class="product-info">
-                <h4>${p.name}</h4>
-                <p>${p.price}円</p>
-              </div>
-              <button class="btn-add" onclick="addToCart(${p.id})">＋</button>
+        const html = `
+          <div class="shop-card" onclick="openShopDetail('${encodeURIComponent(shopName)}')">
+            <div class="shop-title-area">
+              <div class="shop-name">🏪 ${shopName}</div>
+              <div class="shop-preview">おすすめ: ${firstProduct.name} (${firstProduct.price}円)</div>
             </div>
-          `;
-        });
-
-        html += `
+            <div class="shop-header-right">
+              <span class="shop-fee">送料 ${shipping}円</span>
+              <span class="arrow-icon">➔</span>
             </div>
           </div>
         `;
@@ -420,37 +383,39 @@
       }
     }
 
-    // アコーディオンの開閉処理
-    function toggleShop(cardId, contentId) {
-      const card = document.getElementById(cardId);
-      const content = document.getElementById(contentId);
+    // 特定店舗の専用ページを開く
+    function openShopDetail(encodedShopName) {
+      const shopName = decodeURIComponent(encodedShopName);
+      const shopProducts = products.filter(p => p.shop === shopName);
 
-      if (card.classList.contains('open')) {
-        card.classList.remove('open');
-        content.style.maxHeight = "0px";
-      } else {
-        card.classList.add('open');
-        content.style.maxHeight = content.scrollHeight + "px";
-      }
+      if (shopProducts.length === 0) return;
+
+      document.getElementById('detail-shop-name').innerText = `🏪 ${shopName}`;
+      document.getElementById('detail-shop-fee').innerText = `配送料: ${shopProducts[0].shipping}円`;
+
+      const listContainer = document.getElementById('detail-product-list');
+      listContainer.innerHTML = shopProducts.map(p => `
+        <div class="product-row">
+          <div class="product-info">
+            <h4>${p.name}</h4>
+            <p>${p.price}円</p>
+          </div>
+          <button class="btn-add" onclick="addToCart(${p.id})">＋</button>
+        </div>
+      `).join('');
+
+      showPage('page-shop-detail');
     }
 
-    // 検索機能（検索時はヒットした商品があるお店を自動で開く）
+    // 検索機能
     function filterProducts() {
       const q = document.getElementById('search-box').value.toLowerCase();
       if (!q) {
-        renderProducts(products);
+        renderShops(products);
         return;
       }
-
       const filtered = products.filter(p => p.name.toLowerCase().includes(q) || p.shop.toLowerCase().includes(q));
-      renderProducts(filtered);
-
-      // 検索ヒット時、すべて自動で展開表示する
-      document.querySelectorAll('.shop-card').forEach((card) => {
-        card.classList.add('open');
-        const content = card.querySelector('.shop-content');
-        if (content) content.style.maxHeight = content.scrollHeight + "px";
-      });
+      renderShops(filtered);
     }
 
     function addToCart(id) {
