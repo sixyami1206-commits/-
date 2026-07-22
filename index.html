@@ -1,580 +1,919 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>デリバリー Rabbit 🥡</title>
-  <style>
-    :root {
-      --bg-light: #F8F9FA;
-      --bg-white: #FFFFFF;
-      --uber-green: #06C167;
-      --uber-green-hover: #049E53;
-      --text-dark: #111111;
-      --text-sub: #6B6B6B;
-      --border-color: #E5E5E5;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rabbit Delivery Express 🥡</title>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #ff4757;
+            --primary-hover: #ff6b81;
+            --secondary: #2ed573;
+            --dark: #2f3542;
+            --light: #f1f2f6;
+            --gray: #a4b0be;
+            --border: #eccc68;
+            --card-shadow: 0 8px 24px rgba(149, 157, 165, 0.1);
+            --radius: 16px;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg-light); color: var(--text-dark); padding-bottom: 110px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
 
-    header {
-      position: sticky; top: 0; z-index: 100;
-      background: var(--bg-white);
-      border-bottom: 1px solid var(--border-color);
-      padding: 14px 20px;
-      display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    .brand-logo { font-size: 1.3rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-    .brand-logo span { color: var(--uber-green); }
+        body {
+            background-color: #f8f9fa;
+            color: var(--dark);
+            padding-top: 70px;
+            padding-bottom: 80px;
+        }
 
-    .header-actions { display: flex; align-items: center; gap: 10px; }
+        /* --- ナビゲーションバー --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
 
-    .user-badge {
-      background: #E8F5E9; border: 1px solid #C8E6C9; padding: 6px 12px;
-      border-radius: 20px; font-size: 0.8rem; font-weight: 700; color: #2E7D32;
-      display: none; align-items: center; gap: 6px;
-    }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
 
-    .btn-cart-header {
-      background: var(--uber-green); color: #FFF; border: none;
-      padding: 8px 16px; border-radius: 30px; font-weight: 700; font-size: 0.9rem;
-      cursor: pointer; display: flex; align-items: center; gap: 6px;
-    }
+        .nav-tools {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
 
-    .btn-nav {
-      background: #F0F0F0; color: var(--text-dark); border: none;
-      padding: 8px 14px; border-radius: 30px; font-weight: 600; font-size: 0.85rem; cursor: pointer;
-    }
+        .cart-icon-btn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--dark);
+            cursor: pointer;
+        }
 
-    .container { max-width: 600px; margin: 0 auto; padding: 20px 15px; }
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .search-container { position: relative; margin-bottom: 20px; }
-    .search-input {
-      width: 100%; padding: 14px 18px 14px 45px;
-      background: var(--bg-white); border: 1px solid var(--border-color);
-      border-radius: 30px; color: var(--text-dark); font-size: 0.95rem; outline: none;
-    }
-    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-sub); }
+        .user-btn {
+            background: var(--light);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .shop-card {
-      background: var(--bg-white);
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
-      margin-bottom: 16px;
-      padding: 18px 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .shop-card:hover { background: #FAFAFA; }
+        /* --- ヒーローバナー --- */
+        .hero {
+            background: linear-gradient(135deg, #ff4757, #ff7f50);
+            color: white;
+            padding: 40px 5%;
+            border-radius: 0 0 var(--radius) var(--radius);
+            margin-bottom: 30px;
+            text-align: center;
+        }
 
-    .shop-title-area { display: flex; flex-direction: column; gap: 4px; }
-    .shop-name { font-size: 1.15rem; font-weight: 800; color: var(--text-dark); }
-    .shop-preview { font-size: 0.85rem; color: var(--text-sub); font-weight: 500; }
+        .hero h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
 
-    .shop-header-right { display: flex; align-items: center; gap: 12px; }
-    .shop-fee { font-size: 0.8rem; font-weight: 700; color: #E65100; background: #FFF3E0; padding: 4px 10px; border-radius: 12px; }
+        .hero p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
 
-    .product-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border-color);
-    }
-    .product-row:last-child { border-bottom: none; }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
-    .btn-add {
-      background: var(--uber-green); color: #FFF; border: none;
-      width: 36px; height: 36px; border-radius: 50%;
-      font-size: 1.2rem; font-weight: bold; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-    }
+        /* --- 検索 & フィルター --- */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
 
-    .floating-cart {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--bg-white); border-top: 1px solid var(--border-color);
-      padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 90;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
-    }
-    .cart-price { font-size: 1.25rem; font-weight: 900; }
-    .btn-primary { background: var(--uber-green); color: #FFF; border: none; padding: 12px 28px; border-radius: 30px; font-weight: 800; font-size: 0.95rem; cursor: pointer; }
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
 
-    .page-view { display: none; }
-    .page-view.active { display: block; }
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 1px solid #e2e8f0;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            outline: none;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
 
-    .card-box { background: var(--bg-white); border-radius: 16px; padding: 22px; border: 1px solid var(--border-color); margin-bottom: 20px; }
-    .form-group { margin-bottom: 16px; }
-    .form-group label { font-size: 0.85rem; color: var(--text-sub); display: block; margin-bottom: 6px; font-weight: 600; }
-    .form-group input {
-      width: 100%; padding: 12px 14px; background: #FAFAFA; border: 1px solid var(--border-color);
-      border-radius: 10px; color: var(--text-dark); font-size: 0.95rem; outline: none;
-    }
+        .search-box i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
 
-    .btn-full { width: 100%; background: var(--uber-green); color: #FFF; border: none; padding: 14px; border-radius: 30px; font-weight: 800; font-size: 1rem; cursor: pointer; margin-top: 10px; }
-    .btn-outline { width: 100%; background: transparent; color: var(--text-dark); border: 1px solid var(--border-color); padding: 12px; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        /* --- タブ切り替え --- */
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid #edf2f7;
+            margin-bottom: 25px;
+        }
 
-    .history-card { background: #FAFAFA; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
-    .status-badge {
-      display: inline-block; background: #E3F2FD; color: #1565C0; font-weight: 800;
-      padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; margin-top: 6px;
-    }
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
 
-    #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.85); z-index: 999; justify-content: center; align-items: center; flex-direction: column; gap: 12px; }
-    .spin { width: 45px; height: 45px; border: 4px solid var(--border-color); border-top-color: var(--uber-green); border-radius: 50%; animation: sp 0.8s linear infinite; }
-    @keyframes sp { to { transform: rotate(360deg); } }
-  </style>
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* --- 商品グリッド --- */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: #fff;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 160px;
+            background: #f1f2f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--gray);
+        }
+
+        .product-info {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-shop {
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .product-price-row {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 15px;
+        }
+
+        .price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .shipping {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .add-cart-btn {
+            width: 100%;
+            background: var(--dark);
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .add-cart-btn:hover {
+            background: var(--primary);
+        }
+
+        /* --- モーダル (カート・認証) --- */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 2000;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #edf2f7;
+            padding-bottom: 10px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            margin-top: 10px;
+        }
+
+        /* --- カート内リスト --- */
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .cart-total-box {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        .total-row.grand {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            border-top: 1px solid #cbd5e0;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+
+        /* --- 注文履歴カード --- */
+        .history-card {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .badge-status {
+            display: inline-block;
+            background: #e1f5fe;
+            color: #0288d1;
+            font-weight: bold;
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
 
-  <div id="loader">
-    <div class="spin"></div>
-    <div id="loader-msg" style="font-weight: 800;">処理中...</div>
-  </div>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar">
+        <div class="logo" onclick="switchTab('shop')">
+            <i class="fa-solid fa-burger"></i> Rabbit Delivery
+        </div>
+        <div class="nav-tools">
+            <button class="cart-icon-btn" onclick="openCartModal()">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span class="cart-badge" id="cartBadge">0</span>
+            </button>
+            <button class="user-btn" id="userNavBtn" onclick="openAuthModal()">
+                <i class="fa-regular fa-user"></i> <span id="userNameText">ログイン</span>
+            </button>
+        </div>
+    </nav>
 
-  <header>
-    <div class="brand-logo" onclick="showPage('page-menu')">Uber <span>Eats Rabbit 🥡</span></div>
-    
-    <div class="header-actions">
-      <div id="user-badge" class="user-badge">
-        <span>👤</span> <span id="user-id-text">ID: ---</span>
-      </div>
-
-      <button class="btn-cart-header" onclick="goToCheckout()">
-        🛒 <span id="header-cart-count">0</span>
-      </button>
-
-      <button id="btn-login-nav" class="btn-nav" onclick="showPage('page-auth')">ログイン</button>
-      <button id="btn-history-nav" class="btn-nav" onclick="loadOrderHistory()" style="display:none;">注文履歴</button>
-      <button id="btn-logout-nav" class="btn-nav" onclick="logout()" style="display:none; background:#FFEBEE; color:#C62828;">ログアウト</button>
-    </div>
-  </header>
-
-  <div class="container">
-
-    <!-- 店舗一覧 -->
-    <div id="page-menu" class="page-view active">
-      <div class="search-container">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="search-box" class="search-input" placeholder="店舗名や商品を検索..." oninput="filterProducts()">
-      </div>
-      <div id="shop-list">店舗データを取得中...</div>
+    <!-- ヒーローエリア -->
+    <div class="hero">
+        <h1>出来たての味をお手元まで 🛵</h1>
+        <p>お店の本格的なクオリティを、スピーディーにお届けします。</p>
     </div>
 
-    <!-- 店舗詳細 -->
-    <div id="page-shop-detail" class="page-view">
-      <button class="btn-outline" onclick="showPage('page-menu')" style="margin-bottom: 15px; width: auto; padding: 8px 16px;">← 店舗一覧に戻る</button>
-      <div class="card-box">
-        <h2 id="detail-shop-name" style="margin-bottom: 6px;">---</h2>
-        <div id="detail-shop-fee" style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px;">---</div>
-        <hr style="border-color: var(--border-color); margin-bottom: 15px;">
-        <div id="detail-product-list"></div>
-      </div>
-    </div>
+    <div class="container">
 
-    <!-- 注文確認 -->
-    <div id="page-checkout" class="page-view">
-      <div class="card-box">
-        <h2 style="margin-bottom: 15px;">🛍️ カートの確認</h2>
-        <div id="cart-summary" style="margin-bottom: 15px; color: var(--text-sub);"></div>
-        <hr style="border-color: var(--border-color); margin-bottom: 15px;">
-
-        <div class="form-group"><label>お名前</label><input type="text" id="ord-name"></div>
-        <div class="form-group"><label>お届け先住所</label><input type="text" id="ord-address"></div>
-        <div class="form-group"><label>メールアドレス</label><input type="email" id="ord-email"></div>
-
-        <button class="btn-full" onclick="sendOrderAuthCode()">注文用コードを送信して進む ➔</button>
-        <button class="btn-outline" onclick="showPage('page-menu')">メニューへ戻る</button>
-      </div>
-    </div>
-
-    <!-- 注文検証 -->
-    <div id="page-verify-order" class="page-view">
-      <div class="card-box" style="text-align: center;">
-        <h2>🔐 注文認証コードの入力</h2>
-        <p style="font-size: 0.85rem; color: var(--text-sub); margin-top: 8px;">メールに送信された **6桁のコード** を入力してください。</p>
-
-        <div class="form-group" style="margin-top: 20px; text-align: left;">
-          <label>6桁の認証コード</label>
-          <input type="text" id="ord-auth-code" style="text-align: center; font-size: 1.3rem; letter-spacing: 5px;">
+        <!-- メイン機能タブ -->
+        <div class="tab-nav">
+            <button class="tab-btn active" id="tabShopBtn" onclick="switchTab('shop')">メニューから選ぶ</button>
+            <button class="tab-btn" id="tabHistoryBtn" onclick="switchTab('history')">注文履歴・配達追跡</button>
         </div>
 
-        <button class="btn-full" onclick="submitOrderFinal()">注文を確定する 🛵💨</button>
-        <button class="btn-outline" onclick="showPage('page-checkout')">戻る</button>
-      </div>
-    </div>
-
-    <!-- 会員登録 / ログイン -->
-    <div id="page-auth" class="page-view">
-      <div class="card-box">
-        <h2>👤 会員ログイン</h2>
-        <div id="login-step1">
-          <div class="form-group" style="margin-top: 15px;"><label>メールアドレス</label><input type="email" id="login-email"></div>
-          <div class="form-group"><label>パスワード</label><input type="password" id="login-pass"></div>
-          <button class="btn-full" onclick="sendLoginCode()">ログイン認証コードを送信</button>
-        </div>
-
-        <div id="login-step2" style="display: none; margin-top: 15px;">
-          <div class="form-group">
-            <label>6桁の認証コード</label>
-            <input type="text" id="login-auth-code" style="text-align: center; font-size: 1.2rem; letter-spacing: 4px;">
-          </div>
-          <button class="btn-full" onclick="verifyLoginCode()">認証してログイン完了</button>
-        </div>
-
-        <hr style="border-color: var(--border-color); margin: 25px 0;">
-
-        <h2>✨ 新規会員登録</h2>
-        <div class="form-group" style="margin-top: 15px;"><label>登録用メールアドレス</label><input type="email" id="reg-email"></div>
-        <button class="btn-outline" onclick="sendRegCode()">登録コードを送信</button>
-
-        <div id="reg-step2" style="display: none; margin-top: 15px;">
-          <div class="form-group"><label>認証コード (6桁)</label><input type="text" id="reg-code"></div>
-          <div class="form-group"><label>パスワード</label><input type="password" id="reg-pass"></div>
-          <div class="form-group"><label>お名前</label><input type="text" id="reg-name"></div>
-          <div class="form-group"><label>お届け先住所</label><input type="text" id="reg-address"></div>
-          <button class="btn-full" onclick="completeRegister()">登録を完了する</button>
-        </div>
-
-        <button class="btn-outline" onclick="showPage('page-menu')" style="margin-top: 15px;">戻る</button>
-      </div>
-    </div>
-
-    <!-- 注文履歴 & 追跡状況 -->
-    <div id="page-history" class="page-view">
-      <div class="card-box">
-        <h2>📜 注文履歴 & リアルタイム追跡</h2>
-        <div id="history-container" style="margin-top: 15px;"></div>
-        <button class="btn-outline" onclick="showPage('page-menu')">メニューへ戻る</button>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="floating-cart">
-    <div>
-      <div style="font-size: 0.8rem; color: var(--text-sub);"><span id="cart-count-bar">0</span> 点を選択中</div>
-      <div class="cart-price" id="cart-total-bar">0円</div>
-    </div>
-    <button class="btn-primary" onclick="goToCheckout()">注文手続きへ ➔</button>
-  </div>
-
-  <script>
-    // 🛠️ 新しくデプロイしたGASのウェブアプリURLをここに貼り付けてください
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyXHAia7M-SLAz9KIPIwCt20s4t95V8AW0BfcRrM5wFsgCVdj0ViUlN9yKlslFjJla9/exec";
-
-    let products = [];
-    let cart = [];
-    let currentUser = null;
-
-    window.onload = () => {
-      loadLocalStorageData();
-      loadProducts();
-    };
-
-    function loadLocalStorageData() {
-      const savedUser = localStorage.getItem('rabbit_user');
-      if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        updateUserUI();
-      }
-
-      const savedCart = localStorage.getItem('rabbit_cart');
-      if (savedCart) {
-        cart = JSON.parse(savedCart);
-        updateCartUI();
-      }
-    }
-
-    function updateUserUI() {
-      if (currentUser) {
-        document.getElementById('user-id-text').innerText = `${currentUser.userId} (${currentUser.name} 様)`;
-        document.getElementById('user-badge').style.display = 'flex';
-        document.getElementById('btn-login-nav').style.display = 'none';
-        document.getElementById('btn-history-nav').style.display = 'block';
-        document.getElementById('btn-logout-nav').style.display = 'block';
-
-        document.getElementById('ord-name').value = currentUser.name;
-        document.getElementById('ord-address').value = currentUser.address;
-        document.getElementById('ord-email').value = currentUser.email;
-      } else {
-        document.getElementById('user-badge').style.display = 'none';
-        document.getElementById('btn-login-nav').style.display = 'block';
-        document.getElementById('btn-history-nav').style.display = 'none';
-        document.getElementById('btn-logout-nav').style.display = 'none';
-      }
-    }
-
-    function logout() {
-      localStorage.removeItem('rabbit_user');
-      currentUser = null;
-      updateUserUI();
-      alert('ログアウトしました');
-      showPage('page-menu');
-    }
-
-    function showPage(pageId) {
-      document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
-      document.getElementById(pageId).classList.add('active');
-      window.scrollTo(0,0);
-    }
-
-    function showLoader(msg) {
-      document.getElementById('loader-msg').innerText = msg;
-      document.getElementById('loader').style.display = 'flex';
-    }
-
-    function hideLoader() {
-      document.getElementById('loader').style.display = 'none';
-    }
-
-    async function loadProducts() {
-      try {
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'get_products' }) });
-        const data = await res.json();
-        if (data.status === 'success') {
-          products = data.products;
-          renderShops(products);
-        }
-      } catch (e) {
-        document.getElementById('shop-list').innerText = "商品データの取得に失敗しました。";
-      }
-    }
-
-    function filterProducts() {
-      const keyword = document.getElementById('search-box').value.toLowerCase();
-      const filtered = products.filter(p => p.name.toLowerCase().includes(keyword) || p.shop.toLowerCase().includes(keyword));
-      renderShops(filtered);
-    }
-
-    function renderShops(items) {
-      const container = document.getElementById('shop-list');
-      container.innerHTML = "";
-      if (items.length === 0) {
-        container.innerHTML = "<p style='text-align:center;'>該当する店舗または商品がありません。</p>";
-        return;
-      }
-
-      const shops = {};
-      items.forEach(p => {
-        if (!shops[p.shop]) shops[p.shop] = [];
-        shops[p.shop].push(p);
-      });
-
-      for (const shopName in shops) {
-        const shopProducts = shops[shopName];
-        const shipping = shopProducts[0].shipping;
-        const firstProduct = shopProducts[0];
-
-        container.innerHTML += `
-          <div class="shop-card" onclick="openShopDetail('${encodeURIComponent(shopName)}')">
-            <div class="shop-title-area">
-              <div class="shop-name">🏪 ${shopName}</div>
-              <div class="shop-preview">おすすめ: ${firstProduct.name} (${firstProduct.price}円)</div>
+        <!-- 1. ショップセクション -->
+        <section id="shopSection">
+            <div class="controls">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" oninput="filterProducts()" placeholder="商品名やお店の名前で検索...">
+                </div>
             </div>
-            <div class="shop-header-right">
-              <span class="shop-fee">送料 ${shipping}円</span>
-              <span style="font-weight:bold; color:var(--text-sub);">➔</span>
+
+            <div class="product-grid" id="productGrid">
+                <!-- JavaScriptで商品を動的読み込み -->
+                <div style="grid-column: 1/-1; text-align: center; color: var(--gray); padding: 40px;">
+                    <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+                    <p style="margin-top: 10px;">メニューを取得しています...</p>
+                </div>
             </div>
-          </div>
-        `;
-      }
-    }
+        </section>
 
-    function openShopDetail(encodedShopName) {
-      const shopName = decodeURIComponent(encodedShopName);
-      const shopProducts = products.filter(p => p.shop === shopName);
-      if (shopProducts.length === 0) return;
+        <!-- 2. 注文履歴セクション -->
+        <section id="historySection" class="hidden">
+            <div id="historyList">
+                <!-- 履歴を動的表示 -->
+            </div>
+        </section>
 
-      document.getElementById('detail-shop-name').innerText = `🏪 ${shopName}`;
-      document.getElementById('detail-shop-fee').innerText = `配送料: ${shopProducts[0].shipping}円`;
+    </div>
 
-      document.getElementById('detail-product-list').innerHTML = shopProducts.map(p => `
-        <div class="product-row">
-          <div>
-            <h4>${p.name}</h4>
-            <p style="color:var(--text-sub); font-weight:600;">${p.price}円</p>
-          </div>
-          <button class="btn-add" onclick="addToCart(${p.id})">＋</button>
+    <!-- カート モーダル -->
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-cart-shopping"></i> ショッピングカート</h2>
+                <button class="close-btn" onclick="closeModal('cartModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div id="cartItemsContainer">
+                <!-- カート内容 -->
+            </div>
+
+            <div class="cart-total-box" id="cartTotalBox">
+                <div class="total-row"><span>小計</span><span id="subtotalText">0円</span></div>
+                <div class="total-row"><span>送料</span><span id="shippingText">0円</span></div>
+                <div class="total-row grand"><span>合計金額</span><span id="totalText">0円</span></div>
+            </div>
+
+            <!-- コード送信・認証フロー -->
+            <div id="checkoutStep1">
+                <button class="btn-primary" onclick="startCheckout()"><i class="fa-solid fa-paper-plane"></i> 注文認証コードを送信</button>
+            </div>
+
+            <div id="checkoutStep2" class="hidden" style="margin-top: 15px;">
+                <div class="form-group">
+                    <label>メールに届いた 6桁の認証コード</label>
+                    <input type="text" id="orderAuthCode" placeholder="123456" maxlength="6">
+                </div>
+                <button class="btn-primary" onclick="submitOrder()"><i class="fa-solid fa-check"></i> 注文を確定する</button>
+            </div>
         </div>
-      `).join('');
+    </div>
 
-      showPage('page-shop-detail');
-    }
+    <!-- ログイン・会員登録 モーダル -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="authTitle">ログイン</h2>
+                <button class="close-btn" onclick="closeModal('authModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
 
-    function addToCart(id) {
-      const p = products.find(i => i.id === id);
-      if (p) {
-        cart.push(p);
-        localStorage.setItem('rabbit_cart', JSON.stringify(cart));
-        updateCartUI();
-      }
-    }
+            <!-- ログイン フォーム -->
+            <div id="loginView">
+                <div class="form-group">
+                    <label>メールアドレス</label>
+                    <input type="email" id="loginEmail" placeholder="example@mail.com">
+                </div>
+                <div class="form-group">
+                    <label>パスワード</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••">
+                </div>
+                <button class="btn-primary" onclick="requestLoginCode()">認証コードを送信</button>
+                <button class="btn-primary btn-secondary" onclick="toggleAuthMode('register')">新規会員登録はこちら</button>
+            </div>
 
-    function updateCartUI() {
-      const count = cart.length;
-      document.getElementById('header-cart-count').innerText = count;
-      document.getElementById('cart-count-bar').innerText = count;
+            <!-- ログインコード検証 -->
+            <div id="loginVerifyView" class="hidden">
+                <p style="font-size:0.85rem; margin-bottom: 12px; color: var(--gray);">メールアドレスに送信された 6桁のコードを入力してください。</p>
+                <div class="form-group">
+                    <label>認証コード</label>
+                    <input type="text" id="loginCode" maxlength="6" placeholder="123456">
+                </div>
+                <button class="btn-primary" onclick="verifyLoginCode()">ログイン完了</button>
+            </div>
 
-      const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-      const shipping = count > 0 ? Math.max(...cart.map(i => i.shipping)) : 0;
-      document.getElementById('cart-total-bar').innerText = (subtotal + shipping) + "円";
-    }
+            <!-- 会員登録 フォーム -->
+            <div id="registerView" class="hidden">
+                <div class="form-group">
+                    <label>お名前</label>
+                    <input type="text" id="regName" placeholder="山田 太郎">
+                </div>
+                <div class="form-group">
+                    <label>お届け先住所</label>
+                    <input type="text" id="regAddress" placeholder="東京都渋谷区...">
+                </div>
+                <div class="form-group">
+                    <label>メールアドレス</label>
+                    <input type="email" id="regEmail" placeholder="example@mail.com">
+                </div>
+                <div class="form-group">
+                    <label>パスワード</label>
+                    <input type="password" id="regPassword" placeholder="••••••••">
+                </div>
+                <button class="btn-primary" onclick="requestRegisterCode()">確認コードを送信</button>
+                <button class="btn-primary btn-secondary" onclick="toggleAuthMode('login')">ログインに戻る</button>
+            </div>
 
-    function goToCheckout() {
-      if (cart.length === 0) return alert('カートに商品を入れてください！');
-      document.getElementById('cart-summary').innerHTML = cart.map(i => `
-        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-          <span>${i.name}</span><strong>${i.price}円</strong>
+            <!-- 会員登録コード検証 -->
+            <div id="registerVerifyView" class="hidden">
+                <div class="form-group">
+                    <label>認証コード (6桁)</label>
+                    <input type="text" id="regCode" maxlength="6" placeholder="123456">
+                </div>
+                <button class="btn-primary" onclick="completeRegister()">登録を完了する</button>
+            </div>
         </div>
-      `).join('');
-      showPage('page-checkout');
-    }
+    </div>
 
-    async function sendLoginCode() {
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-pass').value;
-      if (!email || !password) return alert("入力してください");
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzmJ11twqRSpmty1RRrneRvN7lZcJPOnQ3wdCVXCIAZLck-7dqpa0PX2kQlR-jjbChh/exec";
 
-      showLoader("認証コードを送信中...");
-      try {
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'send_login_code', email, password }) });
-        const data = await res.json();
-        hideLoader();
-        alert(data.message);
-        if (data.status === 'success') {
-          document.getElementById('login-step1').style.display = 'none';
-          document.getElementById('login-step2').style.display = 'block';
-        }
-      } catch(e) { hideLoader(); }
-    }
+        let products = [];
+        let cart = [];
+        let currentUser = null;
 
-    async function verifyLoginCode() {
-      const email = document.getElementById('login-email').value;
-      const code = document.getElementById('login-auth-code').value;
+        // アイコン絵文字マッピング
+        const foodIcons = ['🍔', '🍕', '🍜', '🍱', '🍣', 'カレー', '🥪', '🥗', '🍰', '☕️'];
 
-      showLoader("ログイン中...");
-      try {
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'verify_login_code', email, code }) });
-        const data = await res.json();
-        hideLoader();
-        alert(data.message);
-        if (data.status === 'success') {
-          currentUser = data.user;
-          localStorage.setItem('rabbit_user', JSON.stringify(currentUser));
-          updateUserUI();
-          showPage('page-menu');
-        }
-      } catch(e) { hideLoader(); }
-    }
+        window.onload = function() {
+            const saved = localStorage.getItem("rabbit_user");
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                updateUserUI();
+            }
+            fetchProducts();
+        };
 
-    async function sendOrderAuthCode() {
-      const email = document.getElementById('ord-email').value;
-      showLoader("注文コード送信中...");
-      try {
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'send_order_code', email }) });
-        const data = await res.json();
-        hideLoader();
-        alert(data.message);
-        if (data.status === 'success') showPage('page-verify-order');
-      } catch(e) { hideLoader(); }
-    }
-
-    async function submitOrderFinal() {
-      const name = document.getElementById('ord-name').value;
-      const address = document.getElementById('ord-address').value;
-      const email = document.getElementById('ord-email').value;
-      const code = document.getElementById('ord-auth-code').value;
-
-      const itemsText = cart.map(i => i.name).join(', ');
-      const subtotal = cart.reduce((sum, i) => sum + i.price, 0);
-      const shipping = Math.max(...cart.map(i => i.shipping));
-
-      showLoader("注文処理 & Discord通知中...");
-      try {
-        const res = await fetch(GAS_URL, {
-          method: 'POST',
-          body: JSON.stringify({ action: 'verify_and_create_order', name, address, email, code, items: itemsText, subtotal, shipping })
-        });
-        const data = await res.json();
-        hideLoader();
-
-        alert(`${data.message}\n注文ID: ${data.orderId}\n追跡番号: ${data.trackingNo}`);
-        if (data.status === 'success') {
-          cart = [];
-          localStorage.removeItem('rabbit_cart');
-          updateCartUI();
-          showPage('page-menu');
-        }
-      } catch(e) { hideLoader(); }
-    }
-
-    async function loadOrderHistory() {
-      if (!currentUser) return alert("ログインしてください");
-      showPage('page-history');
-      showLoader("注文履歴 & 追跡状況を取得中...");
-
-      try {
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'get_order_history', email: currentUser.email }) });
-        const data = await res.json();
-        hideLoader();
-
-        const container = document.getElementById('history-container');
-        if (data.history.length === 0) {
-          container.innerHTML = "<p>注文履歴がありません。</p>";
-          return;
+        // --- データ取得 ---
+        async function fetchProducts() {
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "get_products" })
+                });
+                const data = await res.json();
+                if (data.status === "success") {
+                    products = data.products;
+                    renderProducts(products);
+                }
+            } catch (e) {
+                document.getElementById('productGrid').innerHTML = '<p style="grid-column:1/-1; text-align:center;">商品の読み込みに失敗しました。</p>';
+            }
         }
 
-        container.innerHTML = data.history.map(h => `
-          <div class="history-card">
-            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.85rem; color:var(--text-sub);">
-              <span>🆔 ${h.orderId}</span>
-              <span>📅 ${h.date}</span>
-            </div>
-            <div style="font-weight: bold; margin: 8px 0;">🛒 ${h.items}</div>
-            <div style="font-size:0.85rem; color:var(--text-sub);">追跡番号: <strong>${h.trackingNo}</strong></div>
-            <div class="status-badge">🚚 ステータス: ${h.status}</div>
-            <div style="text-align:right; font-weight:bold; color:var(--uber-green); margin-top:8px;">
-              合計: ${h.total}円
-            </div>
-          </div>
-        `).join('');
-      } catch(e) { hideLoader(); }
-    }
+        function renderProducts(list) {
+            const grid = document.getElementById('productGrid');
+            if (list.length === 0) {
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">商品が見つかりません。</p>';
+                return;
+            }
 
-    async function sendRegCode() {
-      const email = document.getElementById('reg-email').value;
-      showLoader("コード送信中...");
-      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'send_code', email }) });
-      const data = await res.json();
-      hideLoader();
-      alert(data.message);
-      if (data.status === 'success') document.getElementById('reg-step2').style.display = 'block';
-    }
+            grid.innerHTML = list.map((p, idx) => `
+                <div class="product-card">
+                    <div class="product-img">
+                        ${foodIcons[idx % foodIcons.length]}
+                    </div>
+                    <div class="product-info">
+                        <div class="product-shop">${p.shop}</div>
+                        <div class="product-title">${p.name}</div>
+                        <div class="product-price-row">
+                            <span class="price">${p.price.toLocaleString()}円</span>
+                            <span class="shipping">送料 ${p.shipping}円</span>
+                        </div>
+                        <button class="add-cart-btn" onclick="addToCart(${p.id})">
+                            <i class="fa-solid fa-plus"></i> カートに追加
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-    async function completeRegister() {
-      const email = document.getElementById('reg-email').value;
-      const code = document.getElementById('reg-code').value;
-      const password = document.getElementById('reg-pass').value;
-      const name = document.getElementById('reg-name').value;
-      const address = document.getElementById('reg-address').value;
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = products.filter(p => 
+                p.name.toLowerCase().includes(query) || p.shop.toLowerCase().includes(query)
+            );
+            renderProducts(filtered);
+        }
 
-      showLoader("登録中...");
-      const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'complete_profile', email, code, password, name, address }) });
-      const data = await res.json();
-      hideLoader();
-      alert(data.message);
-      if (data.status === 'success') {
-        currentUser = data.user;
-        localStorage.setItem('rabbit_user', JSON.stringify(currentUser));
-        updateUserUI();
-        showPage('page-menu');
-      }
-    }
-  </script>
+        // --- カート処理 ---
+        function addToCart(id) {
+            const prod = products.find(p => p.id === id);
+            if (!prod) return;
+
+            const existing = cart.find(c => c.id === id);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ ...prod, qty: 1 });
+            }
+            updateCartBadge();
+        }
+
+        function updateCartBadge() {
+            const count = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cartBadge').innerText = count;
+        }
+
+        function openCartModal() {
+            renderCartModal();
+            document.getElementById('cartModal').classList.add('active');
+        }
+
+        function renderCartModal() {
+            const container = document.getElementById('cartItemsContainer');
+            if (cart.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:var(--gray); padding:20px;">カートは空です。</p>';
+                document.getElementById('cartTotalBox').classList.add('hidden');
+                document.getElementById('checkoutStep1').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('cartTotalBox').classList.remove('hidden');
+            document.getElementById('checkoutStep1').classList.remove('hidden');
+
+            let subtotal = 0;
+            let shipping = 0;
+
+            container.innerHTML = cart.map(item => {
+                subtotal += item.price * item.qty;
+                shipping = Math.max(shipping, item.shipping); // 最も高い送料を採用
+
+                return `
+                    <div class="cart-item">
+                        <div>
+                            <div style="font-weight:bold;">${item.name}</div>
+                            <div style="font-size:0.85rem; color:var(--gray);">${item.price.toLocaleString()}円 × ${item.qty}</div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <button onclick="changeQty(${item.id}, -1)" style="padding:2px 8px;">-</button>
+                            <span>${item.qty}</span>
+                            <button onclick="changeQty(${item.id}, 1)" style="padding:2px 8px;">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const total = subtotal + shipping;
+            document.getElementById('subtotalText').innerText = subtotal.toLocaleString() + '円';
+            document.getElementById('shippingText').innerText = shipping.toLocaleString() + '円';
+            document.getElementById('totalText').innerText = total.toLocaleString() + '円';
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(c => c.id === id);
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(c => c.id !== id);
+            }
+            updateCartBadge();
+            renderCartModal();
+        }
+
+        // --- 注文処理 ---
+        async function startCheckout() {
+            if (!currentUser) {
+                closeModal('cartModal');
+                openAuthModal();
+                alert("注文にはログインが必要です。");
+                return;
+            }
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "send_order_code", email: currentUser.email })
+                });
+                const data = await res.json();
+                if (data.status === "success") {
+                    alert("メールに注文用認証コードを送信しました。");
+                    document.getElementById('checkoutStep1').classList.add('hidden');
+                    document.getElementById('checkoutStep2').classList.remove('hidden');
+                } else {
+                    alert(data.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました。");
+            }
+        }
+
+        async function submitOrder() {
+            const code = document.getElementById('orderAuthCode').value;
+            if (!code) return alert("認証コードを入力してください");
+
+            const itemsSummary = cart.map(c => `${c.name} × ${c.qty}`).join(', ');
+            const subtotal = cart.reduce((sum, c) => sum + c.price * c.qty, 0);
+            const shipping = Math.max(...cart.map(c => c.shipping));
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "verify_and_create_order",
+                        email: currentUser.email,
+                        name: currentUser.name,
+                        address: currentUser.address,
+                        items: itemsSummary,
+                        subtotal: subtotal,
+                        shipping: shipping,
+                        code: code
+                    })
+                });
+                const data = await res.json();
+                if (data.status === "success") {
+                    alert(`ご注文ありがとうございます！\n追跡番号: ${data.trackingNo}`);
+                    cart = [];
+                    updateCartBadge();
+                    closeModal('cartModal');
+                    switchTab('history');
+                } else {
+                    alert(data.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました。");
+            }
+        }
+
+        // --- 注文履歴の表示 ---
+        async function loadOrderHistory() {
+            const container = document.getElementById('historyList');
+            if (!currentUser) {
+                container.innerHTML = '<p style="text-align:center; padding:40px;">ログインすると注文履歴と追跡状況を確認できます。</p>';
+                return;
+            }
+
+            container.innerHTML = '<p style="text-align:center; padding:20px;"><i class="fa-solid fa-spinner fa-spin"></i> 読み込み中...</p>';
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "get_order_history", email: currentUser.email })
+                });
+                const data = await res.json();
+                if (data.status === "success" && data.history.length > 0) {
+                    container.innerHTML = data.history.map(h => `
+                        <div class="history-card">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                                <span style="font-size:0.85rem; color:var(--gray);">注文ID: ${h.orderId}</span>
+                                <span class="badge-status">${h.status}</span>
+                            </div>
+                            <div style="font-size:1.1rem; font-weight:bold; margin-bottom:5px;">${h.items}</div>
+                            <div style="font-size:0.95rem; font-weight:500;">合計金額: ${h.total.toLocaleString()}円</div>
+                            <div style="font-size:0.85rem; color:var(--gray); margin-top:8px;">
+                                追跡番号: <code style="background:#edf2f7; padding:2px 6px; border-radius:4px;">${h.trackingNo}</code>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p style="text-align:center; padding:40px;">注文履歴はありません。</p>';
+                }
+            } catch (e) {
+                container.innerHTML = '<p style="text-align:center; padding:20px;">履歴の読み込みに失敗しました。</p>';
+            }
+        }
+
+        // --- 画面切り替え ＆ モーダル制御 ---
+        function switchTab(tab) {
+            document.getElementById('tabShopBtn').classList.toggle('active', tab === 'shop');
+            document.getElementById('tabHistoryBtn').classList.toggle('active', tab === 'history');
+            document.getElementById('shopSection').classList.toggle('hidden', tab !== 'shop');
+            document.getElementById('historySection').classList.toggle('hidden', tab !== 'history');
+
+            if (tab === 'history') loadOrderHistory();
+        }
+
+        function openAuthModal() {
+            if (currentUser) {
+                if (confirm(`${currentUser.name} 様としてログイン中。ログアウトしますか？`)) {
+                    localStorage.removeItem("rabbit_user");
+                    currentUser = null;
+                    updateUserUI();
+                }
+                return;
+            }
+            document.getElementById('authModal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function updateUserUI() {
+            document.getElementById('userNameText').innerText = currentUser ? currentUser.name : "ログイン";
+        }
+
+        function toggleAuthMode(mode) {
+            document.getElementById('loginView').classList.toggle('hidden', mode !== 'login');
+            document.getElementById('registerView').classList.toggle('hidden', mode !== 'register');
+            document.getElementById('authTitle').innerText = mode === 'login' ? "ログイン" : "新規会員登録";
+        }
+
+        // --- 認証機能 (GAS連携) ---
+        async function requestLoginCode() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action: "send_login_code", email, password }) });
+            const data = await res.json();
+            if (data.status === "success") {
+                document.getElementById('loginView').classList.add('hidden');
+                document.getElementById('loginVerifyView').classList.remove('hidden');
+            } else alert(data.message);
+        }
+
+        async function verifyLoginCode() {
+            const email = document.getElementById('loginEmail').value;
+            const code = document.getElementById('loginCode').value;
+            const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action: "verify_login_code", email, code }) });
+            const data = await res.json();
+            if (data.status === "success") {
+                currentUser = data.user;
+                localStorage.setItem("rabbit_user", JSON.stringify(currentUser));
+                updateUserUI();
+                closeModal('authModal');
+            } else alert(data.message);
+        }
+
+        async function requestRegisterCode() {
+            const email = document.getElementById('regEmail').value;
+            const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action: "send_code", email }) });
+            const data = await res.json();
+            if (data.status === "success") {
+                document.getElementById('registerView').classList.add('hidden');
+                document.getElementById('registerVerifyView').classList.remove('hidden');
+            } else alert(data.message);
+        }
+
+        async function completeRegister() {
+            const name = document.getElementById('regName').value;
+            const address = document.getElementById('regAddress').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const code = document.getElementById('regCode').value;
+
+            const res = await fetch(GAS_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "complete_profile", name, address, email, password, code })
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                currentUser = data.user;
+                localStorage.setItem("rabbit_user", JSON.stringify(currentUser));
+                updateUserUI();
+                closeModal('authModal');
+            } else alert(data.message);
+        }
+    </script>
 </body>
 </html>
